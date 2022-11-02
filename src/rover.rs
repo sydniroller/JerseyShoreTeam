@@ -1,3 +1,5 @@
+extern crate rust_stemmers;
+use rust_stemmers::{Algorithm, Stemmer};
 use bevy::prelude::*;
 use iyes_loopless::prelude::*;
 
@@ -83,7 +85,9 @@ fn text_input(
 
     if keys.just_pressed(KeyCode::Return) {
       let tokens = parser(&*string);
-      for str in tokens.iter() {
+      let stemmed_tokens = stemmer(tokens);
+	  println!("PRESENTING THE STEMMED TOKENS:");
+      for str in stemmed_tokens.iter() {
         println!("{}", str);
       }
         string.clear();
@@ -95,20 +99,19 @@ fn parser(input: &str) ->Vec<&str> {
     let mut strings = Vec::new();
     let split = input.split(" ");
     for s in split {
-        strings.push(s);
+        strings.push(s); // .to_lowercase().as_str();
     }  
     strings
 }
 
-fn stemmer(mut strings: Vec<&str>) ->Vec<&str>  {
-    let mut i=0;
+fn stemmer(mut strings: Vec<&str>) ->Vec<String>  {
     let mut new_strings=Vec::new();
     let stopword = vec!["a","about","above","across","after","afterwards","again","against","all", "almost","purpose"];
+    let en_stemmer = Stemmer::create(Algorithm::English);
     for s in strings{
          if stopword.contains(&&s)==false{
-              new_strings.push(s);
+            new_strings.push(en_stemmer.stem(s).into_owned());
          }
-        i+=1;
     }
     new_strings
 }
